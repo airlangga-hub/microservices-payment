@@ -7,6 +7,7 @@ import (
 	"log"
 
 	"github.com/airlangga-hub/microservices-payment/auth/pb"
+	"github.com/golang-jwt/jwt/v5"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -62,6 +63,10 @@ func (s *Server) ValidateToken(ctx context.Context, token *pb.Token) (*pb.User, 
 
 	userID, err := ValidateJWT(token.Jwt, []byte(s.key))
 	if err != nil {
+		if errors.Is(err, jwt.ErrTokenExpired) {
+			return nil, status.Error(codes.Unauthenticated, "token expired")
+		}
+
 		log.Println("ERROR auth ValidateToken (ValidateJWT): ", err)
 		return nil, status.Error(codes.Unauthenticated, "invalid token")
 	}
