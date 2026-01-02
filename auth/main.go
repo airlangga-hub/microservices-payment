@@ -47,5 +47,6 @@ func main() {
 		log.Fatalln("Error listening to port 9000: ", err)
 	}
 
-	log.Fatalln(s.Serve(lis))
+	log.Println("Listening to port 9000.....")
+	log.Fatalln("Program terminated: ", s.Serve(lis))
 }
