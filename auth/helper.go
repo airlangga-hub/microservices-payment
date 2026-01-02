@@ -2,14 +2,13 @@ package main
 
 import (
 	"errors"
-	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func CreateJWT(email string) (string, error) {
-	key := []byte(os.Getenv("SIGNING_KEY"))
+func CreateJWT(email string, key []byte) (string, error) {
+
 	now := time.Now()
 
 	token := jwt.NewWithClaims(

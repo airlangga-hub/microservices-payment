@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"log"
-	"os"
 
 	"github.com/airlangga-hub/microservices-payment/auth/pb"
 	"google.golang.org/grpc/codes"
@@ -14,7 +13,8 @@ import (
 
 type Server struct {
 	pb.UnimplementedAuthServiceServer
-	db *sql.DB
+	db  *sql.DB
+	key string
 }
 
 func NewServer(db *sql.DB) *Server {
@@ -49,7 +49,7 @@ func (s *Server) GetToken(ctx context.Context, credentials *pb.Credentials) (*pb
 		return nil, status.Error(codes.Internal, "error creating token")
 	}
 
-	jwt, err := CreateJWT(u.Email)
+	jwt, err := CreateJWT(u.Email, []byte(s.key))
 	if err != nil {
 		log.Println("ERROR auth GetToken (CreateJWT): ", err)
 		return nil, status.Error(codes.Internal, "error creating token")
@@ -60,9 +60,7 @@ func (s *Server) GetToken(ctx context.Context, credentials *pb.Credentials) (*pb
 
 func (s *Server) ValidateToken(ctx context.Context, token *pb.Token) (*pb.User, error) {
 
-	key := []byte(os.Getenv("SIGNING_KEY"))
-
-	userID, err := ValidateJWT(token.Jwt, key)
+	userID, err := ValidateJWT(token.Jwt, []byte(s.key))
 	if err != nil {
 		log.Println("ERROR auth ValidateToken (ValidateJWT): ", err)
 		return nil, status.Error(codes.Unauthenticated, "invalid token")
