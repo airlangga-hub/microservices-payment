@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"log"
+	"os"
 
 	"github.com/airlangga-hub/microservices-payment/auth/pb"
 	"google.golang.org/grpc/codes"
@@ -57,4 +58,15 @@ func (s *Server) GetToken(ctx context.Context, credentials *pb.Credentials) (*pb
 	return &pb.Token{Jwt: jwt}, nil
 }
 
-func (s *Server) ValidateToken(ctx context.Context, token *pb.Token) (*pb.User, error)
+func (s *Server) ValidateToken(ctx context.Context, token *pb.Token) (*pb.User, error) {
+
+	key := []byte(os.Getenv("SIGNING_KEY"))
+
+	userID, err := ValidateJWT(token.Jwt, key)
+	if err != nil {
+		log.Println("ERROR auth ValidateToken (ValidateJWT): ", err)
+		return nil, status.Error(codes.Unauthenticated, "invalid token")
+	}
+
+	return &pb.User{UserId: userID}, nil
+}
