@@ -48,7 +48,11 @@ func (s *Server) GetToken(ctx context.Context, credentials *pb.Credentials) (*pb
 		return nil, status.Error(codes.Internal, "error creating token")
 	}
 
-	jwt := CreateJWT(u.Email)
+	jwt, err := CreateJWT(u.Email)
+	if err != nil {
+		log.Println("ERROR auth GetToken (CreateJWT): ", err)
+		return nil, status.Error(codes.Internal, "error creating token")
+	}
 
 	return &pb.Token{Jwt: jwt}, nil
 }
