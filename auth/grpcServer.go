@@ -28,11 +28,12 @@ func (s *Server) GetToken(ctx context.Context, credentials *pb.Credentials) (*pb
 			email,
 			password
 		FROM users
-		WHERE email = ?;
+		WHERE
+			email = ?;
 		`,
 	)
 	if err != nil {
-		log.Println("ERROR auth GetToken: ", err)
+		log.Println("ERROR auth GetToken (db.Prepare): ", err)
 		return nil, status.Error(codes.Internal, "error creating token")
 	}
 
@@ -42,9 +43,14 @@ func (s *Server) GetToken(ctx context.Context, credentials *pb.Credentials) (*pb
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, status.Error(codes.Unauthenticated, "invalid credentials")
 		}
+
+		log.Println("ERROR auth GetToken (stmt.QueryRow): ", err)
+		return nil, status.Error(codes.Internal, "error creating token")
 	}
 
-	return &pb.Token{}, nil
+	jwt := CreateJWT(u.Email)
+
+	return &pb.Token{Jwt: jwt}, nil
 }
 
 func (s *Server) ValidateToken(ctx context.Context, token *pb.Token) (*pb.User, error)
