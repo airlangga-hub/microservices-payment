@@ -8,7 +8,7 @@ service AuthService {
 }
 
 message Credentials {
-    string user_name = 1;
+    string email = 1;
     string password = 2;
 }
 
