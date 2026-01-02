@@ -40,7 +40,7 @@ func (s *Server) GetToken(ctx context.Context, credentials *pb.Credentials) (*pb
 
 	if err := stmt.QueryRow(credentials.Email).Scan(&u.Email, &u.Password); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, status.Error(codes.Unauthenticated, "unauthorized user")
+			return nil, status.Error(codes.Unauthenticated, "invalid credentials")
 		}
 	}
 
