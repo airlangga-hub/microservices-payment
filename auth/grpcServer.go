@@ -10,6 +10,6 @@ type Server struct {
 	pb.UnimplementedAuthServiceServer
 }
 
-func (s *Server) GetToken(ctx context.Context, r *pb.Credentials) (*pb.Token, error)
+func (s *Server) GetToken(ctx context.Context, credentials *pb.Credentials) (*pb.Token, error)
 
-func (s *Server) ValidateToken(ctx context.Context, r *pb.Token) (*pb.User, error)
+func (s *Server) ValidateToken(ctx context.Context, token *pb.Token) (*pb.User, error)
