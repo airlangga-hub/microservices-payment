@@ -18,8 +18,8 @@ type Server struct {
 	key string
 }
 
-func NewServer(db *sql.DB) *Server {
-	return &Server{db: db}
+func NewServer(db *sql.DB, key string) *Server {
+	return &Server{db: db, key: key}
 }
 
 func (s *Server) GetToken(ctx context.Context, credentials *pb.Credentials) (*pb.Token, error) {
