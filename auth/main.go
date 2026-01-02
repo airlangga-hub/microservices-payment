@@ -4,6 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+
+	"github.com/airlangga-hub/microservices-payment/auth/pb"
+	"google.golang.org/grpc"
 )
 
 const (
@@ -32,4 +35,8 @@ func main() {
 	if err := db.Ping(); err != nil {
 		log.Fatalln(err)
 	}
+	
+	// grpc server
+	s := grpc.NewServer()
+	pb.RegisterAuthServiceServer(s, NewServer(db))
 }
