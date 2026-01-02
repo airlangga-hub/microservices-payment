@@ -16,7 +16,7 @@ const (
 	dbUser     = "auth_user"
 	dbPassword = "password"
 
-	dbName = "users"
+	dbName = "auth"
 )
 
 func main() {
