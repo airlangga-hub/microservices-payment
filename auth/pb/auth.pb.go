@@ -119,7 +119,7 @@ func (x *Token) GetJwt() string {
 
 type User struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -154,9 +154,9 @@ func (*User) Descriptor() ([]byte, []int) {
 	return file_auth_pb_auth_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *User) GetUserId() string {
+func (x *User) GetEmail() string {
 	if x != nil {
-		return x.UserId
+		return x.Email
 	}
 	return ""
 }
@@ -170,9 +170,9 @@ const file_auth_pb_auth_proto_rawDesc = "" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"\x19\n" +
 	"\x05Token\x12\x10\n" +
-	"\x03jwt\x18\x01 \x01(\tR\x03jwt\"\x1f\n" +
-	"\x04User\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId2O\n" +
+	"\x03jwt\x18\x01 \x01(\tR\x03jwt\"\x1c\n" +
+	"\x04User\x12\x14\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email2O\n" +
 	"\vAuthService\x12 \n" +
 	"\bGetToken\x12\f.Credentials\x1a\x06.Token\x12\x1e\n" +
 	"\rValidateToken\x12\x06.Token\x1a\x05.UserB8Z6github.com/airlangga-hub/microservices-payment/auth/pbb\x06proto3"

@@ -61,7 +61,7 @@ func (s *Server) GetToken(ctx context.Context, credentials *pb.Credentials) (*pb
 
 func (s *Server) ValidateToken(ctx context.Context, token *pb.Token) (*pb.User, error) {
 
-	userID, err := ValidateJWT(token.Jwt, []byte(s.key))
+	email, err := ValidateJWT(token.Jwt, []byte(s.key))
 	if err != nil {
 		if errors.Is(err, jwt.ErrTokenExpired) {
 			return nil, status.Error(codes.Unauthenticated, "token expired")
@@ -71,5 +71,5 @@ func (s *Server) ValidateToken(ctx context.Context, token *pb.Token) (*pb.User, 
 		return nil, status.Error(codes.Unauthenticated, "invalid token")
 	}
 
-	return &pb.User{UserId: userID}, nil
+	return &pb.User{Email: email}, nil
 }

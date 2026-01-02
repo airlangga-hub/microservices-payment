@@ -17,5 +17,5 @@ message Token {
 }
 
 message User {
-    string user_id = 1;
+    string email = 1;
 }
