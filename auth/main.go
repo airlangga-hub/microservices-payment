@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net"
 
 	"github.com/airlangga-hub/microservices-payment/auth/pb"
 	"google.golang.org/grpc"
@@ -11,32 +12,40 @@ import (
 
 const (
 	dbDriver = "mysql"
-	
-	dbUser = "root"
+
+	dbUser     = "root"
 	dbPassword = "password"
-	
+
 	dbName = "users"
 )
 
 func main() {
 	dsn := fmt.Sprintf("%s:%s@tcp(localhost:3306)/%s", dbUser, dbPassword, dbName)
-	
+
 	db, err := sql.Open(dbDriver, dsn)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	
+
 	defer func() {
 		if err := db.Close(); err != nil {
 			log.Println("Error closing db: ", err)
 		}
 	}()
-	
+
 	if err := db.Ping(); err != nil {
 		log.Fatalln(err)
 	}
-	
+
 	// grpc server
 	s := grpc.NewServer()
 	pb.RegisterAuthServiceServer(s, NewServer(db))
+
+	// listen and serve
+	lis, err := net.Listen("tcp", ":9000")
+	if err != nil {
+		log.Fatalln("Error listening to port 9000: ", err)
+	}
+
+	log.Fatalln(s.Serve(lis))
 }
