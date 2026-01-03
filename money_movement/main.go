@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"os"
 
 	// "github.com/airlangga-hub/microservices-payment/money_movement/pb"
+	"github.com/airlangga-hub/microservices-payment/money_movement/pb"
 	"google.golang.org/grpc"
 )
 
@@ -39,9 +39,8 @@ func main() {
 	}
 
 	// grpc server
-	key := os.Getenv("SIGNING_KEY")
 	s := grpc.NewServer()
-	pb.RegisterAuthServiceServer(s, NewServer(db, key))
+	pb.RegisterMoneyMovementServiceServer(s, NewServer(db))
 
 	// listen and serve
 	lis, err := net.Listen("tcp", ":9000")
