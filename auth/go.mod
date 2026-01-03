@@ -1,4 +1,4 @@
-module github.com/airlangga-hub/microservices-payment
+module github.com/airlangga-hub/microservices-payment/auth
 
 go 1.25.3
 
