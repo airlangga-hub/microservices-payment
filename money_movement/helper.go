@@ -3,9 +3,9 @@ package main
 import "database/sql"
 
 func GetWallet(tx *sql.Tx, userID string) (Wallet, error) {
-	
+
 	var w Wallet
-	
+
 	stmt, err := tx.Prepare(
 		`
 		SELECT
@@ -20,18 +20,18 @@ func GetWallet(tx *sql.Tx, userID string) (Wallet, error) {
 	if err != nil {
 		return Wallet{}, err
 	}
-	
+
 	if err := stmt.QueryRow(userID).Scan(&w.ID, &w.UserID, &w.WalletType); err != nil {
 		return Wallet{}, err
 	}
-	
+
 	return w, nil
 }
 
-func GetAccount(tx *sql.Tx, wallet_id int32, account_type string) (Account, error) {
-	
+func GetAccount(tx *sql.Tx, walletID int32, accountType string) (Account, error) {
+
 	var a Account
-	
+
 	stmt, err := tx.Prepare(
 		`
 		SELECT
@@ -48,10 +48,10 @@ func GetAccount(tx *sql.Tx, wallet_id int32, account_type string) (Account, erro
 	if err != nil {
 		return Account{}, err
 	}
-	
-	if err := stmt.QueryRow(wallet_id, account_type).Scan(&a.ID, &a.Cents, &a.AccountType, &a.WalletID); err != nil {
+
+	if err := stmt.QueryRow(walletID, accountType).Scan(&a.ID, &a.Cents, &a.AccountType, &a.WalletID); err != nil {
 		return Account{}, err
 	}
-	
+
 	return a, nil
 }
