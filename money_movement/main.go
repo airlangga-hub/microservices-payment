@@ -14,10 +14,10 @@ import (
 const (
 	dbDriver = "mysql"
 
-	dbUser     = "auth_user"
+	dbUser     = "money_movement_user"
 	dbPassword = "password"
 
-	dbName = "auth"
+	dbName = "money_movement"
 )
 
 func main() {
