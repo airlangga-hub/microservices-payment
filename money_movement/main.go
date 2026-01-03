@@ -7,7 +7,7 @@ import (
 	"net"
 	"os"
 
-	"github.com/airlangga-hub/microservices-payment/money_movement/pb"
+	// "github.com/airlangga-hub/microservices-payment/money_movement/pb"
 	"google.golang.org/grpc"
 )
 
