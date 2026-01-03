@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option go_package = "github.com/airlangga-hub/microservices-payment/money_movement/pb";
+
+import "google/protobuf/empty.proto";
+
+service MoneyMovementService {
+    rpc Authorize(AuthorizeRequest) returns (AuthorizeResponse);
+    rpc Capture(CaptureRequest) returns (google.protobuf.Empty);
+}
+
+message AuthorizeRequest {
+    string customer_wallet_user_id = 1;
+    string merchant_wallet_user_id = 2;
+    int64 cents = 3;
+    string currency = 4;
+}
+
+message CaptureRequest {
+    string pid = 1;
+}
+
+message AuthorizeResponse {
+    string pid = 1;
+}
