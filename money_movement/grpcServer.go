@@ -81,4 +81,28 @@ func (s *Server) Authorize(ctx context.Context, r *pb.AuthorizeRequest) (*pb.Aut
 	return &pb.AuthorizeResponse{Pid: pid}, nil
 }
 
-func (s *Server) Capture(ctx context.Context, r *pb.CaptureRequest) (*emptypb.Empty, error)
+func (s *Server) Capture(ctx context.Context, r *pb.CaptureRequest) (*emptypb.Empty, error) {
+
+	// begin tx
+	tx, err := s.db.Begin()
+	if err != nil {
+		log.Println("ERROR money movement Capture (db.Begin): ", err)
+		return nil, status.Error(codes.Internal, "failed to capture transaction")
+	}
+
+	defer tx.Rollback()
+
+	authorizedTransaction, err := GetTransaction(tx, r.Pid)
+	if err != nil {
+		log.Println("ERROR money movement Capture (GetTransaction): ", err)
+		return nil, status.Error(codes.Internal, "transaction not found")
+	}
+
+	srcAccount, err := GetAccount(tx, authorizedTransaction.DstWalletID, "PAYMENT")
+	if err != nil {
+		log.Println("ERROR money movement Capture (GetAccount): ", err)
+		return nil, status.Error(codes.Internal, "account not found")
+	}
+
+	return &emptypb.Empty{}, nil
+}

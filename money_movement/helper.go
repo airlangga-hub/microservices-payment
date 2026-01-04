@@ -171,3 +171,10 @@ func CreateTransaction(tx *sql.Tx, srcAccount, dstAccount Account, customerWalle
 	
 	return pid, nil
 }
+
+func GetTransaction(tx *sql.Tx, pid string) (Transaction, error) {
+	
+	
+	
+	return Transaction{}, nil
+}
