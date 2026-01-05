@@ -65,7 +65,7 @@ func (s *Server) Authorize(ctx context.Context, r *pb.AuthorizeRequest) (*pb.Aut
 		return nil, status.Error(codes.Internal, "failed transfer")
 	}
 
-	pid, err := CreateTransaction(tx, srcAccount, dstAccount, customerWallet, merchantWallet, r.Cents)
+	pid, err := CreateTransaction(tx, srcAccount, dstAccount, customerWallet.UserID, customerWallet.UserID, merchantWallet.ID, r.Cents)
 	if err != nil {
 		log.Println("ERROR money movement Authorize (CreateTransaction): ", err)
 		return nil, status.Error(codes.Internal, "failed creating transaction")
@@ -115,8 +115,18 @@ func (s *Server) Capture(ctx context.Context, r *pb.CaptureRequest) (*emptypb.Em
 		log.Println("ERROR money movement Capture (Transfer): ", err)
 		return nil, status.Error(codes.Internal, "failed to transfer fund")
 	}
-	
-	_, err = CreateTransaction(tx, srcAccount, dstMerchantAccount)
+
+	merchantWallet, err := GetWalletByID(tx, authorizedTransaction.FinalDstMerchantWalletID)
+	if err != nil {
+		log.Println("ERROR money movement Capture (GetWalletByID): ", err)
+		return nil, status.Error(codes.Internal, "merchant wallet not found")
+	}
+
+	_, err = CreateTransaction(tx, srcAccount, dstMerchantAccount, authorizedTransaction.DstUserID, merchantWallet.UserID, merchantWallet.ID, int64(authorizedTransaction.Amount))
+	if err != nil {
+		log.Println("ERROR money movement Capture (CreateTransaction): ", err)
+		return nil, status.Error(codes.Internal, "failed to create transaction")
+	}
 
 	return &emptypb.Empty{}, nil
 }

@@ -143,7 +143,7 @@ const (
 	`
 )
 
-func CreateTransaction(tx *sql.Tx, srcAccount, dstAccount Account, customerWallet, merchantWallet Wallet, amount int64) (string, error) {
+func CreateTransaction(tx *sql.Tx, srcAccount, dstAccount Account, srcUserID, dstUserID string, merchantWalletID int32, amount int64) (string, error) {
 
 	pid := uuid.NewString()
 
@@ -154,15 +154,15 @@ func CreateTransaction(tx *sql.Tx, srcAccount, dstAccount Account, customerWalle
 
 	_, err = stmt.Exec(
 		pid,
-		customerWallet.UserID,
-		customerWallet.UserID,
+		srcUserID,
+		dstUserID,
 		srcAccount.WalletID,
 		dstAccount.WalletID,
 		srcAccount.ID,
 		dstAccount.ID,
 		srcAccount.AccountType,
 		dstAccount.AccountType,
-		merchantWallet.ID,
+		merchantWalletID,
 		int32(amount),
 	)
 	if err != nil {
@@ -199,4 +199,11 @@ func GetTransaction(tx *sql.Tx, pid string) (Transaction, error) {
 	}
 
 	return t, nil
+}
+
+func GetWalletByID(tx *sql.Tx, walletID int32) (Wallet, error) {
+    var w Wallet
+    query := `SELECT id, user_id FROM wallets WHERE id = $1`
+    err := tx.QueryRow(query, walletID).Scan(&w.ID, &w.UserID)
+    return w, err
 }
