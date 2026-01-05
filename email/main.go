@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"sync"
 
@@ -49,14 +50,24 @@ func main() {
 
 		go awaitMessages(partitionConsumer, partition, done)
 	}
-	
+
 	wg.Wait()
 }
 
-
 func awaitMessages(partitionConsumer sarama.PartitionConsumer, partition int32, done chan struct{}) {
-	
+
 	defer wg.Done()
-	
-	
+
+	for {
+		select {
+		case msg := <-partitionConsumer.Messages():
+			fmt.Printf("Partition %d - Received message %s\n", partition, string(msg.Value))
+			handleMessage(msg)
+		case <-done:
+			fmt.Println("Done signal received, exiting.....")
+			return
+		}
+	}
 }
+
+func handleMessage(msg *sarama.ConsumerMessage)
