@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 
-	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -146,9 +145,7 @@ const (
 	`
 )
 
-func CreateTransaction(tx *sql.Tx, srcAccount, dstAccount Account, srcUserID, dstUserID string, merchantWalletID int32, amount int64) (string, error) {
-
-	pid := uuid.NewString()
+func CreateTransaction(tx *sql.Tx, pid string, srcAccount, dstAccount Account, srcUserID, dstUserID string, merchantWalletID int32, amount int64) (string, error) {
 
 	stmt, err := tx.Prepare(insertTransactionQuery)
 	if err != nil {
