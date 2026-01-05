@@ -37,8 +37,8 @@ CREATE TABLE IF NOT EXISTS transactions (
 );
 
 -- merchant and customer wallets
-INSERT INTO wallets (user_id, wallet type) VALUES ('user1@email.com', 'CUSTOMER');
-INSERT INTO wallets (user_id, wallet type) VALUES ('merchant_id', 'MERCHANT');
+INSERT INTO wallets (user_id, wallet_type) VALUES ('user1@email.com', 'CUSTOMER');
+INSERT INTO wallets (user_id, wallet_type) VALUES ('merchant_id', 'MERCHANT');
 
 -- customer accounts
 INSERT INTO accounts (cents, account_type, wallet_id) VALUES (5000000, 'DEFAULT', 1);
