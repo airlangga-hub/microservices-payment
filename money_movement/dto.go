@@ -27,3 +27,16 @@ type Transaction struct {
 	FinalDstMerchantWalletID int32  `json:"final_dst_merchant_wallet_id"`
 	Amount                   int32  `json:"amount"`
 }
+
+type EmailMessage struct {
+	OrderID string `json:"order_id"`
+	UserID  string `json:"user_id"`
+}
+
+type LedgerMessage struct {
+	OrderID   string `json:"order_id"`
+	UserID    string `json:"user_id"`
+	Amount    int64  `json:"amount"`
+	Operation string `json:"operation"`
+	Date      string `json:"date"`
+}

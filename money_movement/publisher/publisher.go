@@ -1,7 +1,7 @@
 package publisher
 
 const (
-	emailTopic = "email"
+	emailTopic  = "email"
 	ledgerTopic = "ledger"
 )
 
