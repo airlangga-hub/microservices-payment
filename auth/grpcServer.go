@@ -39,6 +39,7 @@ func (s *Server) GetToken(ctx context.Context, credentials *pb.Credentials) (*pb
 		log.Println("ERROR auth GetToken (db.Prepare): ", err)
 		return nil, status.Error(codes.Internal, "error creating token")
 	}
+	defer stmt.Close()
 
 	var u User
 

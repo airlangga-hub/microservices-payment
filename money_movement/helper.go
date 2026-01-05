@@ -26,6 +26,7 @@ func GetWallet(tx *sql.Tx, userID string) (Wallet, error) {
 	if err != nil {
 		return Wallet{}, err
 	}
+	defer stmt.Close()
 
 	if err := stmt.QueryRow(userID).Scan(&w.ID, &w.UserID, &w.WalletType); err != nil {
 		return Wallet{}, err
@@ -54,6 +55,7 @@ func GetAccount(tx *sql.Tx, walletID int32, accountType string) (Account, error)
 	if err != nil {
 		return Account{}, err
 	}
+	defer stmt.Close()
 
 	if err := stmt.QueryRow(walletID, accountType).Scan(&a.ID, &a.Cents, &a.AccountType, &a.WalletID); err != nil {
 		return Account{}, err
@@ -79,6 +81,7 @@ func Transfer(tx *sql.Tx, srcAccount, dstAccount Account, amount int64) error {
 	if err != nil {
 		return err
 	}
+	defer stmt.Close()
 
 	_, err = stmt.Exec(srcAccount.Cents-int32(amount), srcAccount.ID)
 	if err != nil {
@@ -151,6 +154,7 @@ func CreateTransaction(tx *sql.Tx, srcAccount, dstAccount Account, srcUserID, ds
 	if err != nil {
 		return "", err
 	}
+	defer stmt.Close()
 
 	_, err = stmt.Exec(
 		pid,
@@ -180,6 +184,7 @@ func GetTransaction(tx *sql.Tx, pid string) (Transaction, error) {
 	if err != nil {
 		return Transaction{}, err
 	}
+	defer stmt.Close()
 
 	if err := stmt.QueryRow(pid).Scan(
 		&t.ID,
