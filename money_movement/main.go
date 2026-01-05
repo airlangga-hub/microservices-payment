@@ -39,13 +39,13 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	// grpc server
 	// create publisher
 	publisher, err := sarama.NewAsyncProducer([]string{"localhost:9092"}, sarama.NewConfig())
 	if err != nil {
 		log.Fatalln(err)
 	}
 
+	// grpc server
 	s := grpc.NewServer()
 	pb.RegisterMoneyMovementServiceServer(s, NewServer(db, publisher))
 
