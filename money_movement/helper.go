@@ -203,7 +203,7 @@ func GetTransaction(tx *sql.Tx, pid string) (Transaction, error) {
 
 func GetWalletByID(tx *sql.Tx, walletID int32) (Wallet, error) {
     var w Wallet
-    query := `SELECT id, user_id FROM wallets WHERE id = $1`
+    query := `SELECT id, user_id FROM wallets WHERE id = ?`
     err := tx.QueryRow(query, walletID).Scan(&w.ID, &w.UserID)
     return w, err
 }
