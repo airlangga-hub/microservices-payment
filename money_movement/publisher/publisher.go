@@ -2,6 +2,7 @@ package publisher
 
 import (
 	"log"
+	"sync"
 	"time"
 
 	"github.com/IBM/sarama"
@@ -25,13 +26,7 @@ type LedgerMessage struct {
 	Date      string `json:"date"`
 }
 
-func SendCaptureMessage(pid, srcUserID string, amount int64) {
-
-	// create publisher
-	publisher, err := sarama.NewSyncProducer([]string{"localhost:9092"}, sarama.NewConfig())
-	if err != nil {
-		log.Println("ERROR money movement SendCaptureMessage (NewSyncProducer): ", err)
-	}
+func SendCaptureMessage(publisher sarama.AsyncProducer, pid, srcUserID string, amount int32) {
 
 	defer func() {
 		if err := publisher.Close(); err != nil {
@@ -47,8 +42,13 @@ func SendCaptureMessage(pid, srcUserID string, amount int64) {
 	ledgerMessage := LedgerMessage{
 		OrderID: pid,
 		UserID:  srcUserID,
-		Amount:  amount,
+		Amount:  int64(amount),
 		Date:    time.Now().Format("2020-12-01"),
 	}
+
+	
+}
+
+func sendMessage[T EmailMessage | LedgerMessage](publisher sarama.AsyncProducer, message T, topic string) {
 
 }

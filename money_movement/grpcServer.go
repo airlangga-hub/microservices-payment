@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"log"
 
+	"github.com/IBM/sarama"
 	"github.com/airlangga-hub/microservices-payment/money_movement/pb"
 	"github.com/airlangga-hub/microservices-payment/money_movement/publisher"
 	"github.com/google/uuid"
@@ -15,11 +16,12 @@ import (
 
 type Server struct {
 	pb.UnimplementedMoneyMovementServiceServer
-	db *sql.DB
+	db        *sql.DB
+	publisher sarama.AsyncProducer
 }
 
-func NewServer(db *sql.DB) *Server {
-	return &Server{db: db}
+func NewServer(db *sql.DB, publisher sarama.AsyncProducer) *Server {
+	return &Server{db: db, publisher: publisher}
 }
 
 func (s *Server) Authorize(ctx context.Context, r *pb.AuthorizeRequest) (*pb.AuthorizeResponse, error) {
@@ -68,7 +70,7 @@ func (s *Server) Authorize(ctx context.Context, r *pb.AuthorizeRequest) (*pb.Aut
 	}
 
 	pid := uuid.NewString()
-	
+
 	err = CreateTransaction(tx, pid, srcAccount, dstAccount, customerWallet.UserID, customerWallet.UserID, merchantWallet.ID, r.Cents)
 	if err != nil {
 		log.Println("ERROR money movement Authorize (CreateTransaction): ", err)
@@ -139,7 +141,7 @@ func (s *Server) Capture(ctx context.Context, r *pb.CaptureRequest) (*emptypb.Em
 		return nil, status.Error(codes.Internal, "failed commiting transaction")
 	}
 
-	publisher.SendCaptureMessage(authorizedTransaction.PID, authorizedTransaction.SrcUserID, authorizedTransaction.Amount)
+	go publisher.SendCaptureMessage(s.publisher, authorizedTransaction.PID, authorizedTransaction.SrcUserID, authorizedTransaction.Amount)
 
 	return &emptypb.Empty{}, nil
 }

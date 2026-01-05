@@ -7,6 +7,7 @@ import (
 	"net"
 
 	// "github.com/airlangga-hub/microservices-payment/money_movement/pb"
+	"github.com/IBM/sarama"
 	"github.com/airlangga-hub/microservices-payment/money_movement/pb"
 	"google.golang.org/grpc"
 )
@@ -39,8 +40,14 @@ func main() {
 	}
 
 	// grpc server
+	// create publisher
+	publisher, err := sarama.NewAsyncProducer([]string{"localhost:9092"}, sarama.NewConfig())
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	s := grpc.NewServer()
-	pb.RegisterMoneyMovementServiceServer(s, NewServer(db))
+	pb.RegisterMoneyMovementServiceServer(s, NewServer(db, publisher))
 
 	// listen and serve
 	lis, err := net.Listen("tcp", ":7000")
