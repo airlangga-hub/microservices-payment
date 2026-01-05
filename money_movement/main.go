@@ -45,6 +45,12 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	defer func() {
+		if err := publisher.Close(); err != nil {
+			log.Println("Error closing publisher: ", err)
+		}
+	}()
+
 	// grpc server
 	s := grpc.NewServer()
 	pb.RegisterMoneyMovementServiceServer(s, NewServer(db, publisher))
