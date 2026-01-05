@@ -131,7 +131,7 @@ func (s *Server) Capture(ctx context.Context, r *pb.CaptureRequest) (*emptypb.Em
 	// end tx
 	err = tx.Commit()
 	if err != nil {
-		log.Println("ERROR money movement Authorize (tx.Commit): ", err)
+		log.Println("ERROR money movement Capture (tx.Commit): ", err)
 		return nil, status.Error(codes.Internal, "failed commiting transaction")
 	}
 
