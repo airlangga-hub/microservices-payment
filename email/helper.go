@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/smtp"
 
 	"github.com/IBM/sarama"
 )
@@ -40,6 +41,22 @@ func HandleMessage(msg *sarama.ConsumerMessage) {
 }
 
 func SendEmail(em EmailMessage) error {
+
+	senderEmail := "your_email@gmail.com"
+	password := "your_password"
+
+	message := []byte(fmt.Sprintf("Subject: Payment Processed!\nProcess ID: %s", em.OrderID))
+
+	smtpServer := "smtp.gmail.com"
+	smtpPort := 587
+
+	creds := smtp.PlainAuth("", senderEmail, password, smtpServer)
+
+	smtpAddress := fmt.Sprintf("%s:%d", smtpServer, smtpPort)
+
+	if err := smtp.SendMail(smtpAddress, creds, senderEmail, []string{em.UserID}, message); err != nil {
+		return err
+	}
 
 	return nil
 }
