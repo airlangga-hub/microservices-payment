@@ -145,11 +145,11 @@ const (
 	`
 )
 
-func CreateTransaction(tx *sql.Tx, pid string, srcAccount, dstAccount Account, srcUserID, dstUserID string, merchantWalletID int32, amount int64) (string, error) {
+func CreateTransaction(tx *sql.Tx, pid string, srcAccount, dstAccount Account, srcUserID, dstUserID string, merchantWalletID int32, amount int64) error {
 
 	stmt, err := tx.Prepare(insertTransactionQuery)
 	if err != nil {
-		return "", err
+		return err
 	}
 	defer stmt.Close()
 
@@ -167,10 +167,10 @@ func CreateTransaction(tx *sql.Tx, pid string, srcAccount, dstAccount Account, s
 		int32(amount),
 	)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	return pid, nil
+	return nil
 }
 
 func GetTransaction(tx *sql.Tx, pid string) (Transaction, error) {

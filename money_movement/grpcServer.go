@@ -68,7 +68,8 @@ func (s *Server) Authorize(ctx context.Context, r *pb.AuthorizeRequest) (*pb.Aut
 	}
 
 	pid := uuid.NewString()
-	pid, err = CreateTransaction(tx, pid, srcAccount, dstAccount, customerWallet.UserID, customerWallet.UserID, merchantWallet.ID, r.Cents)
+	
+	err = CreateTransaction(tx, pid, srcAccount, dstAccount, customerWallet.UserID, customerWallet.UserID, merchantWallet.ID, r.Cents)
 	if err != nil {
 		log.Println("ERROR money movement Authorize (CreateTransaction): ", err)
 		return nil, status.Error(codes.Internal, "failed creating transaction")
@@ -125,7 +126,7 @@ func (s *Server) Capture(ctx context.Context, r *pb.CaptureRequest) (*emptypb.Em
 		return nil, status.Error(codes.Internal, "merchant wallet not found")
 	}
 
-	pid, err := CreateTransaction(tx, authorizedTransaction.PID, srcAccount, dstMerchantAccount, authorizedTransaction.DstUserID, merchantWallet.UserID, merchantWallet.ID, int64(authorizedTransaction.Amount))
+	err = CreateTransaction(tx, authorizedTransaction.PID, srcAccount, dstMerchantAccount, authorizedTransaction.DstUserID, merchantWallet.UserID, merchantWallet.ID, int64(authorizedTransaction.Amount))
 	if err != nil {
 		log.Println("ERROR money movement Capture (CreateTransaction): ", err)
 		return nil, status.Error(codes.Internal, "failed to create transaction")
@@ -138,7 +139,7 @@ func (s *Server) Capture(ctx context.Context, r *pb.CaptureRequest) (*emptypb.Em
 		return nil, status.Error(codes.Internal, "failed commiting transaction")
 	}
 
-	publisher.SendCaptureMessage(pid, authorizedTransaction.SrcUserID, authorizedTransaction.Amount)
+	publisher.SendCaptureMessage(authorizedTransaction.PID, authorizedTransaction.SrcUserID, authorizedTransaction.Amount)
 
 	return &emptypb.Empty{}, nil
 }
