@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"sync"
 
 	"github.com/IBM/sarama"
 )
@@ -9,6 +10,8 @@ import (
 const (
 	topic = "email"
 )
+
+var wg sync.WaitGroup
 
 func main() {
 	done := make(chan struct{})
@@ -41,5 +44,19 @@ func main() {
 				log.Println("ERROR closing email partition consumer: ", err)
 			}
 		}()
+
+		wg.Add(1)
+
+		go awaitMessages(partitionConsumer, partition, done)
 	}
+	
+	wg.Wait()
+}
+
+
+func awaitMessages(partitionConsumer sarama.PartitionConsumer, partition int32, done chan struct{}) {
+	
+	defer wg.Done()
+	
+	
 }
