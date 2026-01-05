@@ -9,7 +9,7 @@ USE money_movement;
 CREATE TABLE IF NOT EXISTS wallets (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id VARCHAR(255) NOT NULL UNIQUE,
-    wallet_type VARCHAR(255) NOT NULL,
+    wallet_type VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS accounts (
