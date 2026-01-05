@@ -128,5 +128,12 @@ func (s *Server) Capture(ctx context.Context, r *pb.CaptureRequest) (*emptypb.Em
 		return nil, status.Error(codes.Internal, "failed to create transaction")
 	}
 
+	// end tx
+	err = tx.Commit()
+	if err != nil {
+		log.Println("ERROR money movement Authorize (tx.Commit): ", err)
+		return nil, status.Error(codes.Internal, "failed commiting transaction")
+	}
+
 	return &emptypb.Empty{}, nil
 }
