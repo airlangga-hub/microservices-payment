@@ -47,7 +47,7 @@ func main() {
 
 		wg.Add(1)
 
-		go awaitMessages(partitionConsumer, partition, done)
+		go AwaitMessages(partitionConsumer, partition, done)
 	}
 
 	wg.Wait()

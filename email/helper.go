@@ -8,7 +8,7 @@ import (
 	"github.com/IBM/sarama"
 )
 
-func awaitMessages(partitionConsumer sarama.PartitionConsumer, partition int32, done chan struct{}) {
+func AwaitMessages(partitionConsumer sarama.PartitionConsumer, partition int32, done chan struct{}) {
 
 	defer wg.Done()
 
@@ -16,7 +16,7 @@ func awaitMessages(partitionConsumer sarama.PartitionConsumer, partition int32, 
 		select {
 		case msg := <-partitionConsumer.Messages():
 			fmt.Printf("Partition %d - Received message %s\n", partition, string(msg.Value))
-			handleMessage(msg)
+			HandleMessage(msg)
 		case <-done:
 			fmt.Println("Done signal received, exiting.....")
 			return
@@ -24,7 +24,7 @@ func awaitMessages(partitionConsumer sarama.PartitionConsumer, partition int32, 
 	}
 }
 
-func handleMessage(msg *sarama.ConsumerMessage) {
+func HandleMessage(msg *sarama.ConsumerMessage) {
 
 	var em EmailMessage
 
