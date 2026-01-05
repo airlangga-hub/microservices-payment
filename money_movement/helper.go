@@ -125,7 +125,7 @@ const (
 		);
 	`
 
-	selectTransactionQuery = `
+	selectAuthorizedTransactionQuery = `
 		SELECT
 			id,
 			pid,
@@ -141,7 +141,8 @@ const (
 			amount
 		FROM transactions
 		WHERE
-			pid = ?;
+			pid = ? AND
+			dst_account_type = 'PAYMENT';
 	`
 )
 
@@ -177,7 +178,7 @@ func GetTransaction(tx *sql.Tx, pid string) (Transaction, error) {
 
 	var t Transaction
 
-	stmt, err := tx.Prepare(selectTransactionQuery)
+	stmt, err := tx.Prepare(selectAuthorizedTransactionQuery)
 	if err != nil {
 		return Transaction{}, err
 	}
