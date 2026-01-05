@@ -122,7 +122,7 @@ const (
 			?
 		);
 	`
-	
+
 	selectTransactionQuery = `
 		SELECT
 			id,
@@ -146,12 +146,12 @@ const (
 func CreateTransaction(tx *sql.Tx, srcAccount, dstAccount Account, customerWallet, merchantWallet Wallet, amount int64) (string, error) {
 
 	pid := uuid.NewString()
-	
+
 	stmt, err := tx.Prepare(insertTransactionQuery)
 	if err != nil {
 		return "", err
 	}
-	
+
 	_, err = stmt.Exec(
 		pid,
 		customerWallet.UserID,
@@ -168,13 +168,35 @@ func CreateTransaction(tx *sql.Tx, srcAccount, dstAccount Account, customerWalle
 	if err != nil {
 		return "", err
 	}
-	
+
 	return pid, nil
 }
 
 func GetTransaction(tx *sql.Tx, pid string) (Transaction, error) {
-	
-	
-	
-	return Transaction{}, nil
+
+	var t Transaction
+
+	stmt, err := tx.Prepare(selectTransactionQuery)
+	if err != nil {
+		return Transaction{}, err
+	}
+
+	if err := stmt.QueryRow(pid).Scan(
+		&t.ID,
+		&t.PID,
+		&t.SrcUserID,
+		&t.DstUserID,
+		&t.SrcWalletID,
+		&t.DstWalletID,
+		&t.SrcAccountID,
+		&t.DstAccountID,
+		&t.SrcAccountType,
+		&t.DstAccountType,
+		&t.FinalDstMerchantWalletID,
+		&t.Amount,
+	); err != nil {
+		return Transaction{}, err
+	}
+
+	return t, nil
 }
