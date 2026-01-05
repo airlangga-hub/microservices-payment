@@ -17,10 +17,10 @@ import (
 type Server struct {
 	pb.UnimplementedMoneyMovementServiceServer
 	db        *sql.DB
-	publisher sarama.AsyncProducer
+	publisher sarama.SyncProducer
 }
 
-func NewServer(db *sql.DB, publisher sarama.AsyncProducer) *Server {
+func NewServer(db *sql.DB, publisher sarama.SyncProducer) *Server {
 	return &Server{db: db, publisher: publisher}
 }
 

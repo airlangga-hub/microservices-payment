@@ -1,8 +1,8 @@
 package publisher
 
 import (
+	"encoding/json"
 	"log"
-	"sync"
 	"time"
 
 	"github.com/IBM/sarama"
@@ -26,13 +26,7 @@ type LedgerMessage struct {
 	Date      string `json:"date"`
 }
 
-func SendCaptureMessage(publisher sarama.AsyncProducer, pid, srcUserID string, amount int32) {
-
-	defer func() {
-		if err := publisher.Close(); err != nil {
-			log.Println("ERROR money movement SendCaptureMessage (publisher.Close): ", err)
-		}
-	}()
+func SendCaptureMessage(publisher sarama.SyncProducer, pid, srcUserID string, amount int32) {
 
 	emailMessage := EmailMessage{
 		OrderID: pid,
@@ -43,12 +37,31 @@ func SendCaptureMessage(publisher sarama.AsyncProducer, pid, srcUserID string, a
 		OrderID: pid,
 		UserID:  srcUserID,
 		Amount:  int64(amount),
-		Date:    time.Now().Format("2020-12-01"),
+		Date:    time.Now().Format("2006-01-02"),
 	}
 
-	
+	sendMessage(publisher, emailMessage, emailTopic)
+	sendMessage(publisher, ledgerMessage, ledgerTopic)
 }
 
-func sendMessage[T EmailMessage | LedgerMessage](publisher sarama.AsyncProducer, message T, topic string) {
+func sendMessage[T EmailMessage | LedgerMessage](publisher sarama.SyncProducer, message T, topic string) {
 
+	encodedMessage, err := json.Marshal(message)
+	if err != nil {
+		log.Println("ERROR money movement sendMessage (json.Marshal): ", err)
+		return
+	}
+
+	kafkaMessage := sarama.ProducerMessage{
+		Topic: topic,
+		Value: sarama.StringEncoder(encodedMessage),
+	}
+
+	partition, offset, err := publisher.SendMessage(&kafkaMessage)
+	if err != nil {
+		log.Println("ERROR money movement sendMessage (publisher.SendMessage): ", err)
+		return
+	}
+
+	log.Printf("Message sent to partition %d at offset %d\n", partition, offset)
 }

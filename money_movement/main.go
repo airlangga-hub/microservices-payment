@@ -40,7 +40,7 @@ func main() {
 	}
 
 	// create publisher
-	publisher, err := sarama.NewAsyncProducer([]string{"localhost:9092"}, sarama.NewConfig())
+	publisher, err := sarama.NewSyncProducer([]string{"localhost:9092"}, sarama.NewConfig())
 	if err != nil {
 		log.Fatalln(err)
 	}
