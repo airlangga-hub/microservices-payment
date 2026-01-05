@@ -18,7 +18,7 @@ func AwaitMessages(partitionConsumer sarama.PartitionConsumer, partition int32, 
 			fmt.Printf("Partition %d - Received message %s\n", partition, string(msg.Value))
 			HandleMessage(msg)
 		case <-done:
-			fmt.Println("Done signal received, exiting.....")
+			fmt.Println("Done signal received, exiting go routine.....")
 			return
 		}
 	}
