@@ -45,7 +45,7 @@ func SendEmail(em EmailMessage) error {
 	senderEmail := "your_email@gmail.com"
 	password := "your_password"
 
-	message := []byte(fmt.Sprintf("Subject: Payment Processed!\nProcess ID: %s", em.OrderID))
+	message := fmt.Appendf(nil, "Subject: Payment Processed!\nProcess ID: %s", em.OrderID)
 
 	smtpServer := "smtp.gmail.com"
 	smtpPort := 587
