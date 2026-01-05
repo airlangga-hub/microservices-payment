@@ -29,9 +29,17 @@ func handleMessage(msg *sarama.ConsumerMessage) {
 	var em EmailMessage
 
 	if err := json.Unmarshal(msg.Value, &em); err != nil {
-		log.Println("INFO error reading message")
+		log.Println("INFO error handling message (Unmarshal): ", err)
 		return
 	}
-	
-	SendEmail(em)
+
+	if err := SendEmail(em); err != nil {
+		log.Println("INFO error handling message (SendEmail): ", err)
+		return
+	}
+}
+
+func SendEmail(em EmailMessage) error {
+
+	return nil
 }
