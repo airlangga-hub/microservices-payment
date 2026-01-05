@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/airlangga-hub/microservices-payment/money_movement/pb"
+	"github.com/airlangga-hub/microservices-payment/money_movement/publisher"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -122,7 +123,7 @@ func (s *Server) Capture(ctx context.Context, r *pb.CaptureRequest) (*emptypb.Em
 		return nil, status.Error(codes.Internal, "merchant wallet not found")
 	}
 
-	_, err = CreateTransaction(tx, srcAccount, dstMerchantAccount, authorizedTransaction.DstUserID, merchantWallet.UserID, merchantWallet.ID, int64(authorizedTransaction.Amount))
+	pid, err := CreateTransaction(tx, srcAccount, dstMerchantAccount, authorizedTransaction.DstUserID, merchantWallet.UserID, merchantWallet.ID, int64(authorizedTransaction.Amount))
 	if err != nil {
 		log.Println("ERROR money movement Capture (CreateTransaction): ", err)
 		return nil, status.Error(codes.Internal, "failed to create transaction")
@@ -134,6 +135,8 @@ func (s *Server) Capture(ctx context.Context, r *pb.CaptureRequest) (*emptypb.Em
 		log.Println("ERROR money movement Capture (tx.Commit): ", err)
 		return nil, status.Error(codes.Internal, "failed commiting transaction")
 	}
+	
+	publisher.SendCaptureMessage(pid, authorizedTransaction.SrcUserID, authorizedTransaction.Amount)
 
 	return &emptypb.Empty{}, nil
 }

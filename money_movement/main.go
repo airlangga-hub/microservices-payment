@@ -43,11 +43,11 @@ func main() {
 	pb.RegisterMoneyMovementServiceServer(s, NewServer(db))
 
 	// listen and serve
-	lis, err := net.Listen("tcp", ":9000")
+	lis, err := net.Listen("tcp", ":7000")
 	if err != nil {
-		log.Fatalln("Error listening to port 9000: ", err)
+		log.Fatalln("Error listening to port 7000: ", err)
 	}
 
-	log.Println("Listening to port 9000.....")
+	log.Println("Listening to port 7000.....")
 	log.Fatalln("Program terminated: ", s.Serve(lis))
 }
