@@ -101,8 +101,22 @@ func (s *Server) Capture(ctx context.Context, r *pb.CaptureRequest) (*emptypb.Em
 	srcAccount, err := GetAccount(tx, authorizedTransaction.DstWalletID, "PAYMENT")
 	if err != nil {
 		log.Println("ERROR money movement Capture (GetAccount): ", err)
-		return nil, status.Error(codes.Internal, "account not found")
+		return nil, status.Error(codes.Internal, "source account not found")
 	}
+
+	dstMerchantAccount, err := GetAccount(tx, authorizedTransaction.FinalDstMerchantWalletID, "INCOMING")
+	if err != nil {
+		log.Println("ERROR money movement Capture (GetAccount): ", err)
+		return nil, status.Error(codes.Internal, "destination account not found")
+	}
+
+	err = Transfer(tx, srcAccount, dstMerchantAccount, int64(authorizedTransaction.Amount))
+	if err != nil {
+		log.Println("ERROR money movement Capture (Transfer): ", err)
+		return nil, status.Error(codes.Internal, "failed to transfer fund")
+	}
+	
+	_, err = CreateTransaction(tx, srcAccount, dstMerchantAccount)
 
 	return &emptypb.Empty{}, nil
 }
