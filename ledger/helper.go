@@ -47,5 +47,31 @@ func HandleMessage(msg *sarama.ConsumerMessage) {
 
 func Insert(db *sql.DB, ledger LedgerMessage) error {
 
+	_, err := db.Exec(
+		`
+		INSERT INTO ledger (
+			order_id,
+			user_id,
+			amount,
+			operation,
+			date
+		) VALUES (
+			?,
+			?,
+			?,
+			?,
+			?
+		)
+		`,
+		ledger.OrderID,
+		ledger.UserID,
+		ledger.Amount,
+		ledger.Operation,
+		ledger.Date,
+	)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
