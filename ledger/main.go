@@ -1,5 +1,7 @@
 package main
 
+import "sync"
+
 const (
 	dbDriver = "mysql"
 
@@ -8,5 +10,7 @@ const (
 
 	dbName = "ledger"
 	
-	topic = "ledger"
+	topic = "ledger "
 )
+
+var wg sync.WaitGroup
