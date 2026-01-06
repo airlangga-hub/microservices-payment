@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 
 	authpb "github.com/airlangga-hub/microservices-payment/gateway/auth"
 	mmpb "github.com/airlangga-hub/microservices-payment/gateway/money_movement"
@@ -65,6 +67,58 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func customerPaymentAuthorize(w http.ResponseWriter, r *http.Request)
+func customerPaymentAuthorize(w http.ResponseWriter, r *http.Request) {
+
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		http.Error(w, "empty auth header", http.StatusUnauthorized)
+		return
+	}
+	if !strings.HasPrefix(authHeader, "Bearer ") {
+		http.Error(w, "malformed auth header", http.StatusUnauthorized)
+		return
+	}
+
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+
+	ctx := context.Background()
+
+	user, err := authClient.ValidateToken(
+		ctx,
+		&authpb.Token{Jwt: token},
+	)
+	if err != nil {
+		http.Error(w, "invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	var req AuthorizeRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	res, err := mmClient.Authorize(
+		ctx,
+		&mmpb.AuthorizeRequest{
+			CustomerWalletUserId: user.Email,
+			MerchantWalletUserId: req.MerchantWalletUserId,
+			Cents:                req.Cents,
+			Currency:             req.Currency,
+		},
+	)
+	if err != nil {
+		log.Println("ERROR gateway customerPaymentAuthorize (mmClient.Authorize): ", err)
+		http.Error(w, "transaction authorization failed", http.StatusInternalServerError)
+		return
+	}
+
+	response := AuthorizeResponse{PID: res.Pid}
+
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		log.Println("ERROR gateway customerPaymentAuthorize (.Encode): ", err)
+	}
+}
 
 func customerPaymentCapture(w http.ResponseWriter, r *http.Request)
