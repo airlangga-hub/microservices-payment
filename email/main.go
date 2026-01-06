@@ -2,7 +2,10 @@ package main
 
 import (
 	"log"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 
 	"github.com/IBM/sarama"
 )
@@ -14,7 +17,16 @@ const (
 var wg sync.WaitGroup
 
 func main() {
+	var once sync.Once
 	done := make(chan struct{})
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		sig := <-sigChan
+		log.Printf("Signal %v received, exiting main....\n", sig)
+		once.Do(func() { close(done) })
+	}()
 
 	consumer, err := sarama.NewConsumer([]string{"kafka:9092"}, sarama.NewConfig())
 	if err != nil {
@@ -22,7 +34,6 @@ func main() {
 	}
 
 	defer func() {
-		close(done)
 		if err := consumer.Close(); err != nil {
 			log.Println("ERROR closing email consumer")
 		}
@@ -36,7 +47,10 @@ func main() {
 	for _, partition := range partitions {
 		partitionConsumer, err := consumer.ConsumePartition(topic, partition, sarama.OffsetNewest)
 		if err != nil {
-			log.Fatalln("ERROR opening email partition consumer: ", err)
+			log.Printf("FATAL: email partition %d failed: %v\n", partition, err)
+			once.Do(func() { close(done) })
+			wg.Wait()
+			return
 		}
 
 		wg.Add(1)
