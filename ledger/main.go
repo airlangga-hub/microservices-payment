@@ -7,4 +7,6 @@ const (
 	dbPassword = "password"
 
 	dbName = "ledger"
+	
+	topic = "ledger"
 )
