@@ -65,7 +65,7 @@ func Insert(db *sql.DB, ledger LedgerMessage) error {
 		`,
 		ledger.OrderID,
 		ledger.UserID,
-		int32(ledger.Amount),
+		ledger.Amount,
 		ledger.Operation,
 		ledger.Date,
 	)

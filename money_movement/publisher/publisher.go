@@ -21,7 +21,7 @@ type EmailMessage struct {
 type LedgerMessage struct {
 	OrderID   string `json:"order_id"`
 	UserID    string `json:"user_id"`
-	Amount    int64  `json:"amount"`
+	Amount    int32  `json:"amount"`
 	Operation string `json:"operation"`
 	Date      string `json:"date"`
 }
@@ -36,7 +36,7 @@ func SendCaptureMessage(publisher sarama.SyncProducer, pid, srcUserID string, am
 	ledgerMessage := LedgerMessage{
 		OrderID: pid,
 		UserID:  srcUserID,
-		Amount:  int64(amount),
+		Amount:  amount,
 		Date:    time.Now().Format("2006-01-02"),
 	}
 
