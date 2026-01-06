@@ -30,7 +30,8 @@ func main() {
 
 	consumer, err := sarama.NewConsumer([]string{"kafka:9092"}, sarama.NewConfig())
 	if err != nil {
-		log.Fatalln("ERROR creating email consumer: ", err)
+		log.Println("ERROR creating email consumer: ", err)
+		return
 	}
 
 	defer func() {
@@ -41,7 +42,8 @@ func main() {
 
 	partitions, err := consumer.Partitions(topic)
 	if err != nil {
-		log.Fatalln("ERROR getting email partitions: ", err)
+		log.Println("ERROR getting email partitions: ", err)
+		return
 	}
 
 	for _, partition := range partitions {

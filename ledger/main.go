@@ -63,7 +63,8 @@ func main() {
 
 	consumer, err := sarama.NewConsumer([]string{"kafka:9092"}, sarama.NewConfig())
 	if err != nil {
-		log.Fatalln("ERROR creating ledger consumer: ", err)
+		log.Println("ERROR creating ledger consumer: ", err)
+		return
 	}
 
 	defer func() {
@@ -74,7 +75,8 @@ func main() {
 
 	partitions, err := consumer.Partitions(topic)
 	if err != nil {
-		log.Fatalln("ERROR getting ledger partitions: ", err)
+		log.Println("ERROR getting ledger partitions: ", err)
+		return
 	}
 
 	for _, partition := range partitions {
