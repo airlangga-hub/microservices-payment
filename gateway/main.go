@@ -10,6 +10,9 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+var authClient authpb.AuthServiceClient
+var mmClient mmpb.MoneyMovementServiceClient
+
 func main() {
 	authConn, err := grpc.NewClient("auth:9000", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -18,7 +21,7 @@ func main() {
 	}
 	defer authConn.Close()
 
-	authClient := authpb.NewAuthServiceClient(authConn)
+	authClient = authpb.NewAuthServiceClient(authConn)
 
 	mmConn, err := grpc.NewClient("money_movement:7000", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -27,7 +30,7 @@ func main() {
 	}
 	defer mmConn.Close()
 
-	mmClient := mmpb.NewMoneyMovementServiceClient(mmConn)
+	mmClient = mmpb.NewMoneyMovementServiceClient(mmConn)
 
 	http.HandleFunc("/login", login)
 	http.HandleFunc("/customer/payment/authorize", customerPaymentAuthorize)
