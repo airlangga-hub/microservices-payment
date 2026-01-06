@@ -9,3 +9,7 @@ type AuthorizeRequest struct {
 type AuthorizeResponse struct {
 	PID string `json:"pid"`
 }
+
+type CaptureRequest struct {
+	PID string `json:"pid"`
+}

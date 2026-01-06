@@ -121,4 +121,49 @@ func customerPaymentAuthorize(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func customerPaymentCapture(w http.ResponseWriter, r *http.Request)
+func customerPaymentCapture(w http.ResponseWriter, r *http.Request) {
+
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		http.Error(w, "empty auth header", http.StatusUnauthorized)
+		return
+	}
+	if !strings.HasPrefix(authHeader, "Bearer ") {
+		http.Error(w, "malformed auth header", http.StatusUnauthorized)
+		return
+	}
+
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+
+	ctx := context.Background()
+
+	_, err := authClient.ValidateToken(
+		ctx,
+		&authpb.Token{Jwt: token},
+	)
+	if err != nil {
+		http.Error(w, "invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	var req CaptureRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	_, err = mmClient.Capture(
+		ctx,
+		&mmpb.CaptureRequest{
+			Pid: req.PID,
+		},
+	)
+	if err != nil {
+		log.Println("ERROR gateway customerPaymentAuthorize (mmClient.Capture): ", err)
+		http.Error(w, "transaction capture failed", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
