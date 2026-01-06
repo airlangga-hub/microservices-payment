@@ -11,7 +11,12 @@ import (
 
 func AwaitMessages(partitionConsumer sarama.PartitionConsumer, partition int32, done chan struct{}) {
 
-	defer wg.Done()
+	defer func() {
+		wg.Done()
+		if err := partitionConsumer.Close(); err != nil {
+			log.Println("ERROR closing email partition consumer: ", err)
+		}
+	}()
 
 	for {
 		select {

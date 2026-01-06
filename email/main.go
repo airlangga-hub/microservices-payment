@@ -36,17 +36,10 @@ func main() {
 	for _, partition := range partitions {
 		partitionConsumer, err := consumer.ConsumePartition(topic, partition, sarama.OffsetNewest)
 		if err != nil {
-			log.Fatalln("ERROR consuming email partition: ", err)
+			log.Fatalln("ERROR opening email partition consumer: ", err)
 		}
 
-		defer func() {
-			if err := partitionConsumer.Close(); err != nil {
-				log.Println("ERROR closing email partition consumer: ", err)
-			}
-		}()
-
 		wg.Add(1)
-
 		go AwaitMessages(partitionConsumer, partition, done)
 	}
 
