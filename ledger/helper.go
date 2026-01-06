@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -33,13 +34,13 @@ func HandleMessage(msg *sarama.ConsumerMessage) {
 		return
 	}
 
-	if err := Insert(ledger); err != nil {
+	if err := Insert(db, ledger); err != nil {
 		log.Println("INFO error handling message (Insert): ", err)
 		return
 	}
 }
 
-func Insert(ledger LedgerMessage) error {
+func Insert(db *sql.DB, ledger LedgerMessage) error {
 
 	return nil
 }

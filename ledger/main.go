@@ -20,12 +20,17 @@ const (
 	topic = "ledger"
 )
 
-var wg sync.WaitGroup
+var (
+	wg sync.WaitGroup
+	db *sql.DB
+)
 
 func main() {
+	var err error
+
 	dsn := fmt.Sprintf("%s:%s@tcp(localhost:3306)/%s", dbUser, dbPassword, dbName)
 
-	db, err := sql.Open(dbDriver, dsn)
+	db, err = sql.Open(dbDriver, dsn)
 	if err != nil {
 		log.Fatalln(err)
 	}
