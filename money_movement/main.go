@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
+	"os/signal"
+	"syscall"
 
 	// "github.com/airlangga-hub/microservices-payment/money_movement/pb"
 	"github.com/IBM/sarama"
@@ -26,7 +29,8 @@ func main() {
 
 	db, err := sql.Open(dbDriver, dsn)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 
 	defer func() {
@@ -36,13 +40,15 @@ func main() {
 	}()
 
 	if err := db.Ping(); err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 
 	// create publisher
 	publisher, err := sarama.NewSyncProducer([]string{"localhost:9092"}, sarama.NewConfig())
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 
 	defer func() {
@@ -58,9 +64,23 @@ func main() {
 	// listen and serve
 	lis, err := net.Listen("tcp", ":7000")
 	if err != nil {
-		log.Fatalln("Error listening to port 7000: ", err)
+		log.Println("Error listening to port 7000: ", err)
+		return
 	}
 
+	go func() {
+		sigChan := make(chan os.Signal, 1)
+		signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+
+		sig := <-sigChan
+		log.Printf("Signal %v received. Shutting down gRPC....\n", sig)
+
+		s.GracefulStop()
+	}()
+
 	log.Println("Listening to port 7000.....")
-	log.Fatalln("Program terminated: ", s.Serve(lis))
+	if err := s.Serve(lis); err != nil {
+		log.Println("FATAL: error serving port 7000: ", err)
+		log.Println("Exiting main....")
+	}
 }

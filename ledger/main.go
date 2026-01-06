@@ -35,7 +35,8 @@ func main() {
 
 	db, err = sql.Open(dbDriver, dsn)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 
 	defer func() {
@@ -45,7 +46,8 @@ func main() {
 	}()
 
 	if err := db.Ping(); err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 
 	var once sync.Once

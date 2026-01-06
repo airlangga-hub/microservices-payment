@@ -6,6 +6,8 @@ import (
 	"log"
 	"net"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/airlangga-hub/microservices-payment/auth/pb"
 	"google.golang.org/grpc"
@@ -25,7 +27,8 @@ func main() {
 
 	db, err := sql.Open(dbDriver, dsn)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 
 	defer func() {
@@ -35,7 +38,8 @@ func main() {
 	}()
 
 	if err := db.Ping(); err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 
 	// grpc server
@@ -46,9 +50,23 @@ func main() {
 	// listen and serve
 	lis, err := net.Listen("tcp", ":9000")
 	if err != nil {
-		log.Fatalln("Error listening to port 9000: ", err)
+		log.Println("Error listening to port 7000: ", err)
+		return
 	}
 
+	go func() {
+		sigChan := make(chan os.Signal, 1)
+		signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+
+		sig := <-sigChan
+		log.Printf("Signal %v received. Shutting down gRPC....\n", sig)
+
+		s.GracefulStop()
+	}()
+
 	log.Println("Listening to port 9000.....")
-	log.Fatalln("Program terminated: ", s.Serve(lis))
+	if err := s.Serve(lis); err != nil {
+		log.Println("FATAL: error serving port 9000: ", err)
+		log.Println("Exiting main....")
+	}
 }
