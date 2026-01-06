@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option go_package = "github.com/airlangga-hub/microservices-payment/auth/pb";
+
+service AuthService {
+    rpc GetToken(Credentials) returns (Token);
+    rpc ValidateToken(Token) returns (User);
+}
+
+message Credentials {
+    string email = 1;
+    string password = 2;
+}
+
+message Token {
+    string jwt = 1;
+}
+
+message User {
+    string email = 1;
+}
