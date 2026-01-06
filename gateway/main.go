@@ -1,6 +1,10 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+	authpb "github.com/airlangga-hub/microservices-payment/gateway/auth"
+	mmpb "github.com/airlangga-hub/microservices-payment/gateway/money_movement"
+)
 
 func main() {
 	http.HandleFunc("/login", login)
