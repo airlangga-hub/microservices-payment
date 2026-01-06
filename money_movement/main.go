@@ -18,7 +18,7 @@ import (
 const (
 	dbDriver = "mysql"
 
-	dbUser     = "money_movement_user"
+	dbUser     = "root"
 	dbPassword = "password"
 
 	dbName = "money_movement"

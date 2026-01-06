@@ -15,7 +15,7 @@ import (
 const (
 	dbDriver = "mysql"
 
-	dbUser     = "ledger_user"
+	dbUser     = "root"
 	dbPassword = "password"
 
 	dbName = "ledger"

@@ -16,7 +16,7 @@ import (
 const (
 	dbDriver = "mysql"
 
-	dbUser     = "auth_user"
+	dbUser     = "root"
 	dbPassword = "password"
 
 	dbName = "auth"
