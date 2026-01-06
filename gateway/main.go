@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 
@@ -37,7 +38,32 @@ func main() {
 	http.HandleFunc("/customer/payment/capture", customerPaymentCapture)
 }
 
-func login(w http.ResponseWriter, r *http.Request)
+func login(w http.ResponseWriter, r *http.Request) {
+
+	username, password, ok := r.BasicAuth()
+	if !ok {
+		http.Error(w, "invalid user credentials", http.StatusUnauthorized)
+		return
+	}
+
+	token, err := authClient.GetToken(
+		context.Background(),
+		&authpb.Credentials{
+			Email:    username,
+			Password: password,
+		},
+	)
+	if err != nil {
+		log.Println("ERROR gateway login (GetToken): ", err)
+		http.Error(w, "error creating token", http.StatusInternalServerError)
+		return
+	}
+
+	_, err = w.Write([]byte(token.Jwt))
+	if err != nil {
+		log.Println("ERROR gateway login (w.Write): ", err)
+	}
+}
 
 func customerPaymentAuthorize(w http.ResponseWriter, r *http.Request)
 
